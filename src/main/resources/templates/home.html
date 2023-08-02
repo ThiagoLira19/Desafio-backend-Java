@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <title>Home</title>
+</head>
+<body>
+       
+    <form action="finaliza_pedido" method="post">
+    
+        <p>Selecione o usuário</p>
+
+        <select name="usuario">
+            <option th:each="usuario : ${lista_usuarios}"
+                    th:value="${usuario.cod_usuario}"
+                    th:text="${usuario.nome}" 
+            />
+        </select>
+
+        </br>
+        </br>
+
+        <p>Selecione um produto</p>
+
+        <select name="produto" id="produto" onchange='javascript:exibe_imagem_produto(this);'>
+            <option th:each="produto : ${lista_produtos}"
+                    th:value="${produto.cod_produto}"
+                    th:text="${produto.titulo}" 
+            />
+        </select>
+        <input type="button" id="adicionar_produto" value="+ Adicionar ao Pedido" onclick='javascript:adiciona_produto_no_pedido();'>
+	</br>
+        </br>
+        
+        <div id="animacao_carregamento" style="display:none;"><img th:src='@{imagens/carregamento.gif}' width='50'></div>
+        <div id="visualiza_imagem_produto"></div>
+        
+        </br>
+        </br>
+			
+	Meu pedido atual:
+	<div id="pedido"><br>Pedido vazio!</div>
+        <input type='hidden' id='qtd_produtos_pedido' name='qtd_produtos_pedido' value=''>
+	</br>
+        </br>
+        <input type="submit" value="Finalizar Pedido">&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" id="limpar_pedido" value="Limpar Pedido" onclick='javascript:limpa_pedido();'>
+    
+    </form>
+	
+	<script type='text/javascript'>
+		
+		var contador = 0;
+		var lista_produtos = [];
+		
+		function busca_na_lista(cod_produto){
+			
+			for(let i = 0; i < lista_produtos.length; i++) {
+				if(lista_produtos[i] == cod_produto)
+					return true;
+			}
+			
+			return false;
+			
+		}
+		
+		function adiciona_produto_no_pedido(){
+			
+			contador++;
+		
+			if($("#pedido").text() == "Pedido vazio!")
+				$("#pedido").html("<br>");
+		
+			var nome_produto = $("#produto option:selected").text();
+			var cod_produto = $("#produto option:selected").val();
+			
+			if(busca_na_lista(cod_produto)){
+			
+				var quantidade = $("#quantidade_produto_"+cod_produto).val();
+				quantidade++;
+				$("#quantidade_produto_"+cod_produto).val(quantidade);
+				contador--;
+                                $("#qtd_produtos_pedido").val(contador);
+                                
+			}else{
+				
+				$("#pedido").append(contador+" - <input type='text' id='produto_"+cod_produto+"' name='produto_"+contador+"' readonly='readonly' value='"+nome_produto+"'>Qtd:<input type='number' id='quantidade_produto_"+cod_produto+"' name='quantidade_produto_"+contador+"' value='1'><input type='hidden' name='id_produto_"+contador+"' value='"+cod_produto+"'><br>");
+				lista_produtos.push(cod_produto);
+                                $("#qtd_produtos_pedido").val(contador);
+			}
+			
+		}
+		
+		function limpa_pedido(){
+			
+			contador = 0;
+			lista_produtos = []; 
+			
+			$("#pedido").html("<br>Pedido vazio!");
+                        $("#qtd_produtos_pedido").val(0);                
+        		
+		}
+		
+                function exibe_imagem_produto(cod_produto){
+
+                    $("#visualiza_imagem_produto").hide();
+                    $("#animacao_carregamento").show();
+                    
+                    $.get(
+                            "getImagemProduto",
+                            {cod_produto : cod_produto.value},
+                            function(data) {
+                                var produto = JSON.parse(data);
+                                $("#animacao_carregamento").hide();
+                                $("#visualiza_imagem_produto").html("<img src='"+produto['imagem']+"' width='150'><br><span>"+produto['titulo']+"</span>");
+                                $("#visualiza_imagem_produto").fadeIn("slow");
+                            }
+                    );
+
+                }
+
+	</script>
+    	
+</body>
+</html>

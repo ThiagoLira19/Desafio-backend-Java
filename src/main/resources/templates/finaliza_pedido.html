@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <title>Finaliza pedido</title>
+</head>
+<body>
+
+    <h1>Seu pedido: <span th:text="${usuario}"/></h1>
+    
+    <table id="tabela-instrutores" border='1'>
+	<thead>
+            <tr>
+                <th>#</th>
+                <th>Cód. Produto</th>
+                <th>Nome Produto</th>
+                <th>Preço</th>
+                <th>quantidade</th>
+            </tr>
+	</thead>
+	<tbody>
+            <tr th:each="produto, row : ${produtos}">
+                <td th:text="${row.count}"/>
+                <td th:text="${produto.cod_produto}"/>
+                <td th:text="${produto.titulo}"/>
+                <td th:text="${produto.preco}"/>
+                <td th:text="${produto.quantidade}"/>
+            </tr>
+            <tr>
+                <td colspan="2">Total</td>
+                <td>-</td>
+                <td th:text="${totalPreco}"/>
+                <td th:text="${totalQuantidade}"/>
+            </tr>
+	</tbody>
+    </table>
+
+</body>
+</html>
